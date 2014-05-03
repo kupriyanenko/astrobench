@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * jBone v1.0.10 - 2014-05-03 - Library for DOM manipulation
+ * jBone v1.0.11 - 2014-05-03 - Library for DOM manipulation
  *
  * https://github.com/kupriyanenko/jbone
  *
@@ -7580,6 +7580,7 @@ var Describe = function(name, fn) {
     state.currentSuite = this;
 
     this.id = _.uniqueId('suite');
+    this.sandbox = {};
     this.suite = new Benchmark.Suite({
         name: name
     });
@@ -7588,7 +7589,7 @@ var Describe = function(name, fn) {
         ui.drawSuite(this);
     }.bind(this));
 
-    fn();
+    fn(this.sandbox);
 };
 
 Describe.prototype = {
@@ -7599,9 +7600,7 @@ Describe.prototype = {
 
     add: function(name, fn, options) {
         var suite = this;
-        var bench = new Benchmark(name, function() {
-            fn(suite);
-        }, options);
+        var bench = new Benchmark(name, fn, options);
 
         bench.originFn = fn;
 
@@ -7658,7 +7657,7 @@ __p+='<div class="bench" id="bench-'+
 ((__t=( bench.id ))==null?'':__t)+
 '">\n\t<div class="bench-title fn-show-source">\n\t\t<h2 class="bench-title-text">\n\t\t\t<div>'+
 ((__t=( bench.name ))==null?'':__t)+
-'</div>\n\t\t\t<span class="fn-bench-state bench-state">ready</span>\n\t\t\t<span class="fn-bench-result"></span>\n\t\t\t<span class="fn-bench-status bench-status"></span>\n\t\t</h2>\n\t\t<div class="bench-controls">\n\t\t\t<a href="#" class="fn-run-bench">Run benchmark</a>\n\t\t</div>\n\t</div>\n\t<pre class="bench-source hidden"><code>'+
+'</div>\n\t\t\t<span class="fn-bench-state bench-state">ready</span>\n\t\t\t<span class="fn-bench-result bench-result"></span>\n\t\t\t<span class="fn-bench-status bench-status"></span>\n\t\t</h2>\n\t\t<div class="bench-controls">\n\t\t\t<a href="#" class="fn-run-bench">Run benchmark</a>\n\t\t</div>\n\t</div>\n\t<pre class="bench-source hidden"><code>'+
 ((__t=( hilite(fnstrip(bench.originFn)) ))==null?'':__t)+
 '</code></pre>\n</div>';
 }
@@ -7705,7 +7704,6 @@ var hilite = function(str) {
     return str
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/(".*?")/gm, '<span class="string">$1</span>')
         .replace(/\/\/(.*)/gm, '<span class="comment">//$1</span>')
         .replace(/('.*?')/gm, '<span class="string">$1</span>')
         .replace(/(\d+\.\d+)/gm, '<span class="number">$1</span>')
@@ -7715,15 +7713,18 @@ var hilite = function(str) {
 };
 
 var fnstrip = function(fn) {
-    var str = fn.toString()
-        .replace(/^function.*\n/, '')
-        .replace(/\n[\t ]+}$/, '');
+    str = fn.toString()
+        .replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/^\uFEFF/, '')
+        .replace(/^function *\(.*\) *{/, '')
+        .replace(/\s+\}$/, '');
 
-    var indent = str.match(/^[ \t]*/)[0];
+    var spaces = str.match(/^\n?( *)/)[1].length,
+        tabs = str.match(/^\n?(\t*)/)[1].length,
+        re = new RegExp('^\n?' + (tabs ? '\t' : ' ') + '{' + (tabs ? tabs : spaces) + '}', 'gm');
 
-    return str
-        .replace(new RegExp(/^\s*/), '')
-        .replace(new RegExp('\n' + indent), '\n');
+    str = str.replace(re, '');
+
+    return str.trim();
 };
 
 var onBenchComplete = function(event) {
@@ -7737,7 +7738,9 @@ var onBenchComplete = function(event) {
         $results = $('#bench-' + id + ' .fn-bench-result');
 
     if (error) {
-      result += ': ' + join(error);
+      result += error.toString();
+      $('#bench-' + id)[0].classList.add('warning');
+      $results[0].classList.add('error');
     } else {
       result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
         stats.rme.toFixed(2) + '%';
@@ -7815,6 +7818,11 @@ exports.drawBench = function(suite, bench) {
     });
 
     bench
+        .on('start', function() {
+            $bench[0].classList.remove('fastest');
+            $bench[0].classList.remove('warning');
+            $bench.find('.fn-bench-status, .fn-bench-result').html('');
+        })
         .on('cycle', function() {
             $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
         })

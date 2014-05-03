@@ -1,7 +1,7 @@
 {
   "name": "astrobench",
   "title": "Astrobench",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Library for JavaScript benchmarks based on Benchmark.js",
   "main": "dist/main.js",
   "directories": {
