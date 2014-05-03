@@ -1,0 +1,14 @@
+<div class="bench" id="bench-<%= bench.id %>">
+	<div class="bench-title fn-show-source">
+		<h2 class="bench-title-text">
+			<div><%= bench.name %></div>
+			<span class="fn-bench-state bench-state">ready</span>
+			<span class="fn-bench-result"></span>
+			<span class="fn-bench-status bench-status"></span>
+		</h2>
+		<div class="bench-controls">
+			<a href="#" class="fn-run-bench">Run benchmark</a>
+		</div>
+	</div>
+	<pre class="bench-source hidden"><code><%= hilite(fnstrip(bench.originFn)) %></code></pre>
+</div>

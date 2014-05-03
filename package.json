@@ -1,0 +1,32 @@
+{
+  "name": "astrobench",
+  "title": "Astrobench",
+  "version": "0.0.1",
+  "description": "Library for JavaScript benchmarks based on Benchmark.js",
+  "main": "dist/main.js",
+  "directories": {
+    "example": "examples"
+  },
+  "devDependencies": {
+    "browserify": "~3.44.2",
+    "grunt": "~0.4.4",
+    "grunt-browserify": "~2.0.8",
+    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "jbone": "~1.0.9",
+    "lodash": "~2.4.1",
+    "node-underscorify": "~0.0.9"
+  },
+  "keywords": [
+    "benchmark",
+    "benchmark.js",
+    "speed",
+    "performance"
+  ],
+  "author": "Alexey Kupriyanenko <a.kupriyanenko@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kupriyanenko/astrobench"
+  }
+}
