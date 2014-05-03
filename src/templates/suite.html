@@ -6,7 +6,11 @@
 		</span>
 	</div>
 	<div class="suite-setup hidden">
+		<% if(suite.setupFn) { %>
 		<pre><code><%= suite.setupFn && hilite(fnstrip(suite.setupFn)) %></code></pre>
+		<% } else { %>
+		<pre><code>no setup code</code></pre>
+		<% } %>
 	</div>
 	<div class="fn-benchs suite-bench-list"></div>
 </div>
