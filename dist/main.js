@@ -7664,7 +7664,7 @@ __p+='<div class="suite" id="'+
 '">\n\t<div class="suite-title fn-show-setup">\n\t\t<h1 class="suite-title-text">'+
 ((__t=( suite.suite.name ))==null?'':__t)+
 '</h1>\n\t\t<span class="suite-controls">\n\t\t\t<a href="#" class="fn-run-suite">Run suite</a>\n\t\t</span>\n\t</div>\n\t<div class="suite-setup hidden">\n\t\t<pre><code>'+
-((__t=( hilite(fnstrip(suite.setupFn)) ))==null?'':__t)+
+((__t=( suite.setupFn && hilite(fnstrip(suite.setupFn)) ))==null?'':__t)+
 '</code></pre>\n\t</div>\n\t<div class="fn-benchs suite-bench-list"></div>\n</div>';
 }
 return __p;

@@ -6,7 +6,7 @@
 		</span>
 	</div>
 	<div class="suite-setup hidden">
-		<pre><code><%= hilite(fnstrip(suite.setupFn)) %></code></pre>
+		<pre><code><%= suite.setupFn && hilite(fnstrip(suite.setupFn)) %></code></pre>
 	</div>
 	<div class="fn-benchs suite-bench-list"></div>
 </div>
