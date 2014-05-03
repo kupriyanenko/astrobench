@@ -57,7 +57,7 @@ var run = function(index) {
 
     var describe = state.describes[index];
 
-    describe.suite
+    describe && describe.suite
         .on('complete', function(event) {
             run(++index);
         })
