@@ -16,7 +16,6 @@ var hilite = function(str) {
     return str
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/(".*?")/gm, '<span class="string">$1</span>')
         .replace(/\/\/(.*)/gm, '<span class="comment">//$1</span>')
         .replace(/('.*?')/gm, '<span class="string">$1</span>')
         .replace(/(\d+\.\d+)/gm, '<span class="number">$1</span>')
@@ -26,15 +25,18 @@ var hilite = function(str) {
 };
 
 var fnstrip = function(fn) {
-    var str = fn.toString()
-        .replace(/^function.*\n/, '')
-        .replace(/\n[\t ]+}$/, '');
+    str = fn.toString()
+        .replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/^\uFEFF/, '')
+        .replace(/^function *\(.*\) *{/, '')
+        .replace(/\s+\}$/, '');
 
-    var indent = str.match(/^[ \t]*/)[0];
+    var spaces = str.match(/^\n?( *)/)[1].length,
+        tabs = str.match(/^\n?(\t*)/)[1].length,
+        re = new RegExp('^\n?' + (tabs ? '\t' : ' ') + '{' + (tabs ? tabs : spaces) + '}', 'gm');
 
-    return str
-        .replace(new RegExp(/^\s*/), '')
-        .replace(new RegExp('\n' + indent), '\n');
+    str = str.replace(re, '');
+
+    return str.trim();
 };
 
 var onBenchComplete = function(event) {
@@ -48,7 +50,9 @@ var onBenchComplete = function(event) {
         $results = $('#bench-' + id + ' .fn-bench-result');
 
     if (error) {
-      result += ': ' + join(error);
+      result += error.toString();
+      $('#bench-' + id)[0].classList.add('warning');
+      $results[0].classList.add('error');
     } else {
       result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
         stats.rme.toFixed(2) + '%';
@@ -126,6 +130,11 @@ exports.drawBench = function(suite, bench) {
     });
 
     bench
+        .on('start', function() {
+            $bench[0].classList.remove('fastest');
+            $bench[0].classList.remove('warning');
+            $bench.find('.fn-bench-status, .fn-bench-result').html('');
+        })
         .on('cycle', function() {
             $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
         })

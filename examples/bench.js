@@ -1,10 +1,4 @@
-describe("A suite", function() {
-  var one;
-
-  setup(function(suite) {
-    one = 100;
-  });
-
+describe("B suite", function() {
   bench("String#match", function() {
     !! "Hello world".match(/o/);
   });
@@ -14,12 +8,16 @@ describe("A suite", function() {
   });
 });
 
-describe("B suite", function() {
+describe("A suite", function(suite) {
+  setup(function() {
+    suite.text = "Hello world";
+  });
+
   bench("String#match", function() {
-    !! "Hello world".match(/o/);
+    !! text.match(/o/);
   });
 
   bench("RegExp#test", function() {
-    !! /o/.test("Hello world");
+    !! /o/.test(suite.text);
   });
 });

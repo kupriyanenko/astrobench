@@ -12,6 +12,7 @@ var Describe = function(name, fn) {
     state.currentSuite = this;
 
     this.id = _.uniqueId('suite');
+    this.sandbox = {};
     this.suite = new Benchmark.Suite({
         name: name
     });
@@ -20,7 +21,7 @@ var Describe = function(name, fn) {
         ui.drawSuite(this);
     }.bind(this));
 
-    fn();
+    fn(this.sandbox);
 };
 
 Describe.prototype = {
@@ -31,9 +32,7 @@ Describe.prototype = {
 
     add: function(name, fn, options) {
         var suite = this;
-        var bench = new Benchmark(name, function() {
-            fn(suite);
-        }, options);
+        var bench = new Benchmark(name, fn, options);
 
         bench.originFn = fn;
 

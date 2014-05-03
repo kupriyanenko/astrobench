@@ -114,12 +114,12 @@ body {
 #astrobench .bench-controls {
 	float: right;
 }
-#astrobench .bench-controls a {
-	color: #428BCA;
-}
 #astrobench .bench-status {
 	color: #A94442;
 	font-weight: bold;
+}
+#astrobench .bench-result.error {
+	color: #A94442;
 }
 #astrobench .bench.opened .bench-title {
 	border-radius: 3px 3px 0 0;
@@ -132,7 +132,8 @@ body {
 }
 #astrobench .bench.fastest .bench-title {
 	background-color: #DFF0D8;
-	border: 1px solid #D6E9C6;
+	border-color: #D6E9C6;
+	color: #3C763D;
 }
 #astrobench .bench.fastest .bench-title:hover {
 	border-color: #A3DA75;
@@ -140,8 +141,19 @@ body {
 #astrobench .bench.fastest .bench-status {
 	color: #3C763D;
 }
-#astrobench .bench.fastest .bench-controls a {
+#astrobench .bench.fastest a {
 	color: #3C763D;
+}
+#astrobench .bench.warning .bench-title {
+	background-color: #FCF8E3;
+	border-color: #FAEBCC;
+	color: #8A6D3B;
+}
+#astrobench .bench.warning .bench-title:hover {
+	border-color: #DDCBA6;
+}
+#astrobench .bench.warning a {
+	color: #8A6D3B;
 }
 
 /* Code */
