@@ -27,7 +27,7 @@ body {
 	font-weight: normal;
 }
 #astrobench code {
-	font: 0.9em/1.5 Consolas, "Liberation Mono", Courier, monospace;
+	font: 12px/1.5 Consolas, "Liberation Mono", Courier, monospace;
 }
 #astrobench pre {
 	padding: 1em;
