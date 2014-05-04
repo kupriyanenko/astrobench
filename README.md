@@ -5,4 +5,4 @@
 
 Library for JavaScript benchmarks based on Benchmark.js
 
-[Live Demo](https://rawgit.com/kupriyanenko/astrobench/master/examples/index.html)
+[Live Demo](https://kupriyanenko.github.io/astrobench/demo.html)
