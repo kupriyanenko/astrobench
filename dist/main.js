@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * jBone v1.0.11 - 2014-05-03 - Library for DOM manipulation
+ * jBone v1.0.12 - 2014-05-04 - Library for DOM manipulation
  *
  * https://github.com/kupriyanenko/jbone
  *
@@ -247,7 +247,7 @@ function BoneEvent(e, data) {
     };
 
     for (key in e) {
-        if (e.hasOwnProperty(key) || typeof e[key] === "function") {
+        if (e[key] || typeof e[key] === "function") {
             setter.call(this, key, e);
         }
     }
@@ -286,7 +286,8 @@ fn.on = function(event) {
     if (args.length === 2) {
         callback = args[1];
     } else {
-        target = args[1], callback = args[2];
+        target = args[1];
+        callback = args[2];
     }
 
     addListener = function(el) {
@@ -381,7 +382,7 @@ fn.trigger = function(event) {
             return jBone.Event(event);
         });
     } else {
-        event = event instanceof Event ? event : $.Event(event);
+        event = event instanceof Event ? event : jBone.Event(event);
         events = [event];
     }
 
@@ -7664,7 +7665,9 @@ var run = function(options) {
         state.index = 0;
         state.running = false;
         state.aborted = false;
-        options.onStop && options.onStop();
+        if (options && options.onStop) {
+            options.onStop();
+        }
     }
 };
 
@@ -7685,6 +7688,7 @@ window.describe = function(name, fn) {
 };
 window.setup = setup;
 window.bench = bench;
+window.astrobench = run;
 
 },{"./ui":7,"lodash":2}],4:[function(require,module,exports){
 module.exports = function(obj){
@@ -7830,43 +7834,45 @@ var onBenchComplete = function(event) {
     }
 
     if (error) {
-      result += error.toString();
-      $bench[0].classList.add('warning');
-      $results[0].classList.add('error');
+        result += error.toString();
+        $bench[0].classList.add('warning');
+        $results[0].classList.add('error');
     } else {
-      result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
-        stats.rme.toFixed(2) + '%';
+        result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
+            stats.rme.toFixed(2) + '%';
     }
 
     $results.html(result);
 };
 
 exports.drawSuite = function(suite) {
-    var $suite = $(tmplSuite({
+    suite.$el = $(tmplSuite({
         fnstrip: fnstrip,
         hilite: hilite,
         suite: suite,
         dictionary: dictionary
     }));
 
-    $('.fn-suites').append($suite);
+    $('.fn-suites').append(suite.$el);
 
-    $suite.on('click', '.fn-run-suite', function(e) {
-        e.preventDefault();
-        suite.run();
-    });
+    // dom event binding
+    suite.$el
+        .on('click', '.fn-run-suite', function(e) {
+            e.preventDefault();
+            suite.run();
+        })
+        .on('click', '.fn-show-setup', function(e) {
+            if (e.defaultPrevented) return;
+            $('.suite-setup', suite.$el)[0].classList.toggle('hidden');
+        });
 
-    $suite.on('click', '.fn-show-setup', function(e) {
-        if (e.defaultPrevented) return;
-        $('.suite-setup', $suite)[0].classList.toggle('hidden');
-    });
-
+    // suite event binding
     suite.suite
         .on('start', function() {
-            $suite.find('.fn-run-suite').html(dictionary.stopSuite);
+            suite.$el.find('.fn-run-suite').html(dictionary.stopSuite);
         })
         .on('complete', function(event) {
-            $suite.find('.fn-run-suite').html(dictionary.runSuite);
+            suite.$el.find('.fn-run-suite').html(dictionary.runSuite);
 
             if (event.target.aborted) {
                 return;
@@ -7891,27 +7897,29 @@ exports.drawSuite = function(suite) {
 };
 
 exports.drawBench = function(suite, bench) {
-    var $suite = $('#' + suite.id),
-        $bench = $(tmplBench({
+    var $bench = $(tmplBench({
             bench: bench,
             fnstrip: fnstrip,
             hilite: hilite,
             dictionary: dictionary
         })),
+        // cache state Node for fast writing
         $state = $bench.find('.fn-bench-state');
 
-    $suite.find('.fn-benchs').append($bench);
+    suite.$el.find('.fn-benchs').append($bench);
 
-    $bench.on('click', '.fn-run-bench', function(e) {
-        e.preventDefault();
-        suite.runBenchmark(bench.id);
-    });
+    // dom event binding
+    $bench
+        .on('click', '.fn-run-bench', function(e) {
+            e.preventDefault();
+            suite.runBenchmark(bench.id);
+        })
+        .on('click', '.fn-show-source', function(e) {
+            if (e.defaultPrevented) return;
+            $bench[0].classList.toggle('opened');
+        });
 
-    $bench.on('click', '.fn-show-source', function(e) {
-        if (e.defaultPrevented) return;
-        $bench[0].classList.toggle('opened');
-    });
-
+    // benchmark event binding
     bench
         .on('start', function() {
             $bench[0].classList.remove('fastest');
