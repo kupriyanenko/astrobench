@@ -2,7 +2,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
     browserify: {
       dev: {
-        src: ['src/*.js'],
+        src: ['src/ui.js'],
         dest: 'dist/main.js',
         options: {
           watch: true,

@@ -1,23 +1,27 @@
-describe("B suite", function() {
-  bench("String#match", function() {
-    !! "Hello world".match(/o/);
+describe('A suite', function() {
+  bench('String#match', function() {
+    !! 'Hello world'.match(/o/);
   });
 
-  bench("RegExp#test", function() {
-    !! /o/.test("Hello world");
+  bench('RegExp#test', function() {
+    !! /o/.test('Hello world');
   });
 });
 
-describe("A suite", function(suite) {
+describe('B suite', function(suite) {
   setup(function() {
-    suite.text = "Hello world";
+    suite.text = 'Hello world';
   });
 
-  bench("String#match", function() {
+  bench('Benchmark with error', function() {
     !! text.match(/o/);
   });
 
-  bench("RegExp#test", function() {
+  bench('Deferred benchmark', function(deferred) {
     !! /o/.test(suite.text);
-  });
+
+    setTimeout(function() {
+      deferred.resolve();
+    }, 100);
+  }, { defer: true });
 });

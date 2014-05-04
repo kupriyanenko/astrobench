@@ -27,14 +27,13 @@ body {
 	font-weight: normal;
 }
 #astrobench code {
-	font: 0.9em/1.5 monaco, monospace;
+	font: 0.9em/1.5 Consolas, "Liberation Mono", Courier, monospace;
 }
 #astrobench pre {
 	padding: 1em;
 	border: 1px solid #DDD;
-	border-bottom-color: #DDD;
 	border-radius: 3px;
-	background-color: #F7F7F9;
+	background-color: #F8F8F8;
 }
 
 #astrobench .hidden {
@@ -157,8 +156,8 @@ body {
 }
 
 /* Code */
-#astrobench code .comment { color: #ddd }
+#astrobench code .comment { color: #998 }
 #astrobench code .init { color: #2F6FAD }
-#astrobench code .string { color: #5890AD }
-#astrobench code .keyword { color: #8A6343 }
-#astrobench code .number { color: #2F6FAD }
+#astrobench code .string { color: #D14 }
+#astrobench code .keyword { color: #0086B3; font-weight: bold; }
+#astrobench code .number { color: #099 }

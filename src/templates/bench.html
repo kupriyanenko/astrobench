@@ -7,8 +7,17 @@
 			<span class="fn-bench-status bench-status"></span>
 		</h2>
 		<div class="bench-controls">
-			<a href="#" class="fn-run-bench">Run benchmark</a>
+			<a href="#" class="fn-run-bench"><%= dictionary.runBenchmark %></a>
 		</div>
 	</div>
-	<pre class="bench-source hidden"><code><%= hilite(fnstrip(bench.originFn)) %></code></pre>
+	<%
+	var code = '';
+	if (bench.originOption) {
+		code += hilite('// options\n');
+		code += hilite(JSON.stringify(bench.originOption, null, 2)) + '\n\n';
+		code += hilite('// test\n');
+	}
+	code += hilite(fnstrip(bench.originFn));
+	%>
+	<pre class="bench-source hidden"><code><%= code %></code></pre>
 </div>
