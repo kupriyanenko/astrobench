@@ -96,7 +96,9 @@ var run = function(options) {
         state.index = 0;
         state.running = false;
         state.aborted = false;
-        options.onStop && options.onStop();
+        if (options && options.onStop) {
+            options.onStop();
+        }
     }
 };
 
@@ -117,3 +119,4 @@ window.describe = function(name, fn) {
 };
 window.setup = setup;
 window.bench = bench;
+window.astrobench = run;
