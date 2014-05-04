@@ -6,3 +6,5 @@
 Library for JavaScript benchmarks based on Benchmark.js
 
 [Live Demo](https://kupriyanenko.github.io/astrobench/demo.html)
+
+Documentation in progress. 
