@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * jBone v1.0.12 - 2014-05-04 - Library for DOM manipulation
+ * jBone v1.0.16 - 2014-05-07 - Library for DOM manipulation
  *
  * https://github.com/kupriyanenko/jbone
  *
@@ -37,7 +37,11 @@ isObject = function(el) {
     return el instanceof Object;
 },
 isFunction = function(el) {
-    return typeof el === "function";
+    var getType = {};
+    return el && getType.toString.call(el) === "[object Function]";
+},
+isArray = function(el) {
+    return Array.isArray(el);
 },
 jBone = function(element, data) {
     return new fn.init(element, data);
@@ -111,13 +115,9 @@ fn = jBone.fn = jBone.prototype = {
         if (element instanceof jBone) {
             return element;
         }
-        // Return element wrapped by jBone
-        if (element) {
-            element = Array.isArray(element) ? element : [element];
-            return jBone.merge(this, element);
-        }
 
-        return this;
+        // Return element wrapped by jBone
+        return jBone.makeArray(element, this);
     },
 
     pop: [].pop,
@@ -179,6 +179,22 @@ jBone._cache = {
     jid: 0
 };
 
+function isArraylike(obj) {
+    var length = obj.length,
+        type = typeof obj;
+
+    if (isFunction(type) || obj === win) {
+        return false;
+    }
+
+    if (obj.nodeType === 1 && length) {
+        return true;
+    }
+
+    return isArray(type) || length === 0 ||
+        typeof length === "number" && length > 0 && (length - 1) in obj;
+}
+
 jBone.merge = function(first, second) {
     var l = second.length,
         i = first.length,
@@ -224,6 +240,20 @@ jBone.extend = function(target) {
     });
 
     return target;
+};
+
+jBone.makeArray = function(arr, results) {
+    var ret = results || [];
+
+    if (arr !== null) {
+        if (isArraylike(arr)) {
+            jBone.merge(ret, isString(arr) ? [arr] : arr);
+        } else {
+            ret.push(arr);
+        }
+    }
+
+    return ret;
 };
 
 function BoneEvent(e, data) {
@@ -424,6 +454,8 @@ fn.off = function(event, fn) {
         events, namespace, removeListeners, eventType;
 
     removeListeners = function(el) {
+        var l, eventsByType, e;
+
         events = jBone.getData(el).events;
 
         if (!events) {
@@ -433,9 +465,12 @@ fn.off = function(event, fn) {
         // remove all events
         if (!event && events) {
             return keys(events).forEach(function(eventType) {
-                events[eventType].forEach(function(e, index) {
-                    removeListener(events, eventType, index, el, e);
-                });
+                eventsByType = events[eventType];
+                l = eventsByType.length;
+
+                while(l--) {
+                    removeListener(events, eventType, l, el, eventsByType[l]);
+                }
             });
         }
 
@@ -445,20 +480,28 @@ fn.off = function(event, fn) {
 
             // remove named events
             if (events[eventType]) {
-                events[eventType].forEach(function(e, index) {
+                eventsByType = events[eventType];
+                l = eventsByType.length;
+
+                while(l--) {
+                    e = eventsByType[l];
                     if (!namespace || (namespace && e.namespace === namespace)) {
-                        removeListener(events, eventType, index, el, e);
+                        removeListener(events, eventType, l, el, e);
                     }
-                });
+                }
             }
             // remove all namespaced events
             else if (namespace) {
                 keys(events).forEach(function(eventType) {
-                    events[eventType].forEach(function(e, index) {
+                    eventsByType = events[eventType];
+                    l = eventsByType.length;
+
+                    while(l--) {
+                        e = eventsByType[l];
                         if (e.namespace.split(".")[0] === namespace.split(".")[0]) {
-                            removeListener(events, eventType, index, el, e);
+                            removeListener(events, eventType, l, el, e);
                         }
-                    });
+                    }
                 });
             }
         });
@@ -687,13 +730,25 @@ fn.append = function(appended) {
         length = this.length,
         setter;
 
+    // create jBone object and then append
     if (isString(appended) && rquickExpr.exec(appended)) {
         appended = jBone(appended);
-    } else if (!isObject(appended)) {
+    }
+    // create text node for inserting
+    else if (!isObject(appended)) {
         appended = document.createTextNode(appended);
     }
 
-    if (appended instanceof jBone) {
+    // just append NodeElement
+    if (appended instanceof Node) {
+        setter = function(el) {
+            el.appendChild(appended);
+        };
+    }
+    // wrap object by jBone, and then append
+    else {
+        appended = appended instanceof jBone ? appended : jBone(appended);
+
         setter = function(el, i) {
             appended.forEach(function(node) {
                 if (i) {
@@ -702,10 +757,6 @@ fn.append = function(appended) {
                     el.appendChild(node);
                 }
             });
-        };
-    } else if (appended instanceof Node) {
-        setter = function(el) {
-            el.appendChild(appended);
         };
     }
 
@@ -7627,9 +7678,7 @@ Describe.prototype = {
 
     runBenchmark: function(id) {
         this.suite.filter(function(bench) {
-            if (bench.id !== id) {
-                return;
-            }
+            if (bench.id !== id) return;
 
             var stopped = !bench.running;
             bench.abort();
@@ -7745,7 +7794,7 @@ __p+='\n\t\t<pre><code>'+
 '</code></pre>\n\t\t';
  } else { 
 __p+='\n\t\t<pre><code>'+
-((__t=( hilite('// No preparation code\n') ))==null?'':__t)+
+((__t=( hilite('// No preparation code') ))==null?'':__t)+
 '</code></pre>\n\t\t';
  } 
 __p+='\n\t</div>\n\t<div class="fn-benchs suite-bench-list"></div>\n</div>\n';
@@ -7776,6 +7825,7 @@ $('#astrobench').html(tmplApp({
 
 $('.fn-run-tests').on('click', function(e) {
     e.preventDefault();
+
     astrobench.abort();
 
     $('.fn-run-tests').html(dictionary.stopAll);
@@ -7829,15 +7879,15 @@ var onBenchComplete = function(event) {
 
     $bench.find('.fn-run-bench').html(dictionary.runBenchmark);
 
-    if (!event.target.error && event.target.aborted) {
-        return;
-    }
-
     if (error) {
         result += error.toString();
         $bench[0].classList.add('warning');
         $results[0].classList.add('error');
     } else {
+        if (me.aborted) {
+            return $bench.find('.fn-bench-state').html('aborted');
+        }
+
         result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
             stats.rme.toFixed(2) + '%';
     }
@@ -7874,9 +7924,7 @@ exports.drawSuite = function(suite) {
         .on('complete', function(event) {
             suite.$el.find('.fn-run-suite').html(dictionary.runSuite);
 
-            if (event.target.aborted) {
-                return;
-            }
+            if (event.target.aborted) return;
 
             var fastest = this.filter('fastest'),
                 delta;
@@ -7921,16 +7969,18 @@ exports.drawBench = function(suite, bench) {
 
     // benchmark event binding
     bench
-        .on('start', function() {
+        .on('start', function(event) {
             $bench[0].classList.remove('fastest');
             $bench[0].classList.remove('warning');
             $bench.find('.fn-bench-status, .fn-bench-result').html('');
             $bench.find('.fn-run-bench').html(dictionary.stopBenchmark);
+
+            event.target.off('complete', onBenchComplete);
+            event.target.on('complete', onBenchComplete);
         })
         .on('cycle', function() {
             $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
         })
-        .on('complete', onBenchComplete);
 };
 
 },{"./astrobench":3,"./templates/app.html":4,"./templates/bench.html":5,"./templates/suite.html":6,"jbone":1,"lodash":2}]},{},[3,7])
