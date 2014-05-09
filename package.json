@@ -8,14 +8,14 @@
     "example": "examples"
   },
   "devDependencies": {
-    "browserify": "~3.44.2",
-    "grunt": "~0.4.4",
-    "grunt-browserify": "~2.0.8",
-    "grunt-contrib-concat": "~0.4.0",
-    "grunt-contrib-watch": "~0.6.1",
-    "jbone": "1.0.12",
-    "lodash": "~2.4.1",
-    "node-underscorify": "~0.0.9"
+    "browserify": "3.46",
+    "grunt": "0.4.4",
+    "grunt-browserify": "2.0.8",
+    "grunt-contrib-concat": "0.4.0",
+    "grunt-contrib-watch": "0.6.1",
+    "jbone": "1.0.16",
+    "lodash": "2.4.1",
+    "node-underscorify": "0.0.9"
   },
   "keywords": [
     "benchmark",
