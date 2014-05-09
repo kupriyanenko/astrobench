@@ -58,9 +58,7 @@ Describe.prototype = {
 
     runBenchmark: function(id) {
         this.suite.filter(function(bench) {
-            if (bench.id !== id) {
-                return;
-            }
+            if (bench.id !== id) return;
 
             var stopped = !bench.running;
             bench.abort();

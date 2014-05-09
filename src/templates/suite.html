@@ -9,7 +9,7 @@
 		<% if(suite.setupFn) { %>
 		<pre><code><%= hilite('// Preparation code\n') + hilite(fnstrip(suite.setupFn)) %></code></pre>
 		<% } else { %>
-		<pre><code><%= hilite('// No preparation code\n') %></code></pre>
+		<pre><code><%= hilite('// No preparation code') %></code></pre>
 		<% } %>
 	</div>
 	<div class="fn-benchs suite-bench-list"></div>

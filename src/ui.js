@@ -20,6 +20,7 @@ $('#astrobench').html(tmplApp({
 
 $('.fn-run-tests').on('click', function(e) {
     e.preventDefault();
+
     astrobench.abort();
 
     $('.fn-run-tests').html(dictionary.stopAll);
@@ -73,15 +74,15 @@ var onBenchComplete = function(event) {
 
     $bench.find('.fn-run-bench').html(dictionary.runBenchmark);
 
-    if (!event.target.error && event.target.aborted) {
-        return;
-    }
-
     if (error) {
         result += error.toString();
         $bench[0].classList.add('warning');
         $results[0].classList.add('error');
     } else {
+        if (me.aborted) {
+            return $bench.find('.fn-bench-state').html('aborted');
+        }
+
         result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
             stats.rme.toFixed(2) + '%';
     }
@@ -118,9 +119,7 @@ exports.drawSuite = function(suite) {
         .on('complete', function(event) {
             suite.$el.find('.fn-run-suite').html(dictionary.runSuite);
 
-            if (event.target.aborted) {
-                return;
-            }
+            if (event.target.aborted) return;
 
             var fastest = this.filter('fastest'),
                 delta;
@@ -165,14 +164,16 @@ exports.drawBench = function(suite, bench) {
 
     // benchmark event binding
     bench
-        .on('start', function() {
+        .on('start', function(event) {
             $bench[0].classList.remove('fastest');
             $bench[0].classList.remove('warning');
             $bench.find('.fn-bench-status, .fn-bench-result').html('');
             $bench.find('.fn-run-bench').html(dictionary.stopBenchmark);
+
+            event.target.off('complete', onBenchComplete);
+            event.target.on('complete', onBenchComplete);
         })
         .on('cycle', function() {
             $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
         })
-        .on('complete', onBenchComplete);
 };
