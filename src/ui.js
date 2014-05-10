@@ -61,7 +61,7 @@ var fnstrip = function(fn) {
     return str.trim();
 };
 
-var onBenchComplete = function(event) {
+var onBenchComplete = function(event, suite) {
     var me = event.target,
         error = me.error,
         hz = me.hz,
@@ -87,7 +87,39 @@ var onBenchComplete = function(event) {
             stats.rme.toFixed(2) + '%';
     }
 
+    if (suite && suite.suite.running === false) {
+        onSuiteComplete.call(suite.suite, event, suite);
+    }
+
     $results.html(result);
+};
+
+var onSuiteComplete = function(event, suite) {
+    suite.$el.find('.fn-run-suite').html(dictionary.runSuite);
+
+    if (event.target.aborted) return;
+
+    var fastest = this.filter('fastest'),
+        delta,
+        $bench;
+
+    this.forEach(function(bench) {
+        if (bench.stats.rme === 0) {
+            return;
+        }
+
+        $bench = $('#bench-' + bench.id);
+
+        if (fastest.indexOf(bench) !== -1) {
+            $bench[0].classList.add('fastest');
+            $bench.find('.fn-bench-status').html('(fastest)');
+            return;
+        }
+
+        delta = (Math.abs(bench.hz - fastest.pluck('hz')) / fastest.pluck('hz') * 100).toFixed(2);
+        $bench[0].classList.remove('fastest');
+        $bench.find('.fn-bench-status').html('(' + delta + '% slower)');
+    });
 };
 
 exports.drawSuite = function(suite) {
@@ -117,24 +149,7 @@ exports.drawSuite = function(suite) {
             suite.$el.find('.fn-run-suite').html(dictionary.stopSuite);
         })
         .on('complete', function(event) {
-            suite.$el.find('.fn-run-suite').html(dictionary.runSuite);
-
-            if (event.target.aborted) return;
-
-            var fastest = this.filter('fastest'),
-                delta;
-
-            fastest.forEach(function(bench) {
-                $('#bench-' + bench.id)[0].classList.add('fastest');
-                $('#bench-' + bench.id + ' .fn-bench-status').html('(fastest)');
-            });
-
-            this.forEach(function(bench) {
-                if (fastest.indexOf(bench) !== -1) return;
-
-                delta = (Math.abs(bench.hz - fastest.pluck('hz')) / fastest.pluck('hz') * 100).toFixed(2);
-                $('#bench-' + bench.id + ' .fn-bench-status').html('(' + delta + '% slower)');
-            });
+            onSuiteComplete.call(suite.suite, event, suite);
         })
         .on('cycle', onBenchComplete);
 };
@@ -148,6 +163,10 @@ exports.drawBench = function(suite, bench) {
         })),
         // cache state Node for fast writing
         $state = $bench.find('.fn-bench-state');
+
+    var onComplete = function(event) {
+        onBenchComplete(event, suite);
+    };
 
     suite.$el.find('.fn-benchs').append($bench);
 
@@ -170,8 +189,8 @@ exports.drawBench = function(suite, bench) {
             $bench.find('.fn-bench-status, .fn-bench-result').html('');
             $bench.find('.fn-run-bench').html(dictionary.stopBenchmark);
 
-            event.target.off('complete', onBenchComplete);
-            event.target.on('complete', onBenchComplete);
+            event.target.off('complete', onComplete);
+            event.target.on('complete', onComplete);
         })
         .on('cycle', function() {
             $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
