@@ -100,13 +100,10 @@ var onSuiteComplete = function(event, suite) {
     if (event.target.aborted) return;
 
     var fastest = this.filter('fastest'),
-        delta,
-        $bench;
+        delta, $bench;
 
     this.forEach(function(bench) {
-        if (bench.stats.rme === 0) {
-            return;
-        }
+        if (bench.stats.rme === 0) return;
 
         $bench = $('#bench-' + bench.id);
 
@@ -194,5 +191,5 @@ exports.drawBench = function(suite, bench) {
         })
         .on('cycle', function() {
             $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
-        })
+        });
 };
