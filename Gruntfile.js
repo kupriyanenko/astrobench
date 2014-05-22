@@ -1,5 +1,15 @@
 module.exports = function (grunt) {
   grunt.initConfig({
+    pkg: grunt.file.readJSON("package.json"),
+    meta: {
+      banner: "/*!\n * <%= pkg.title %> v<%= pkg.version %> - " +
+      "<%= grunt.template.today('yyyy-mm-dd') %> - <%= pkg.description %>\n" +
+      " *\n" +
+      " * <%= pkg.homepage %>\n" +
+      " *\n" +
+      " * Copyright <%= grunt.template.today('yyyy') %> <%= pkg.author %>\n" +
+      " * Released under the <%= pkg.license %> license.\n */\n\n"
+    },
     browserify: {
       dev: {
         src: ['src/ui.js'],
@@ -22,6 +32,9 @@ module.exports = function (grunt) {
     },
 
     concat: {
+      options: {
+        banner: "<%= meta.banner %>"
+      },
       dist: {
         src: ['dist/main.js', 'vendors/benchmark.js'],
         dest: 'dist/main.js',

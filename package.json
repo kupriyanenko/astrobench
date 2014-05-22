@@ -1,7 +1,7 @@
 {
   "name": "astrobench",
   "title": "Astrobench",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Library for JavaScript benchmarks based on Benchmark.js",
   "main": "dist/main.js",
   "directories": {
@@ -25,6 +25,7 @@
   ],
   "author": "Alexey Kupriyanenko <a.kupriyanenko@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/kupriyanenko/astrobench",
   "repository": {
     "type": "git",
     "url": "https://github.com/kupriyanenko/astrobench"
