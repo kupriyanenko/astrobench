@@ -1,5 +1,5 @@
 /*!
- * Astrobench - 0.1.0
+ * Astrobench - 0.1.1
  * Library for JavaScript benchmarks based on Benchmark.js
  *
  * https://github.com/kupriyanenko/astrobench
@@ -7638,7 +7638,7 @@ var state = {
     index: 0
 };
 
-var Describe = function(name, fn) {
+var Suite = function(name, fn) {
     // update global state
     state.describes.push(this);
     state.currentSuite = this;
@@ -7656,7 +7656,7 @@ var Describe = function(name, fn) {
     fn(this.sandbox);
 };
 
-Describe.prototype = {
+Suite.prototype = {
     setup: function(fn) {
         this.setupFn = fn;
         fn.call(this, this);
@@ -7708,17 +7708,17 @@ var setup = function(fn) {
 };
 
 var run = function(options) {
-    var describe = state.describes[state.index],
+    var suite = state.describes[state.index],
         onComplete = function() {
             state.index++;
-            describe.suite.off('complete', onComplete);
+            suite.suite.off('complete', onComplete);
             run(options);
         };
 
-    if (describe && !state.aborted) {
+    if (suite && !state.aborted) {
         state.running = true;
-        describe.run();
-        describe.suite.on('complete', onComplete);
+        suite.run();
+        suite.suite.on('complete', onComplete);
     } else {
         state.index = 0;
         state.running = false;
@@ -7741,8 +7741,8 @@ exports.state = state;
 exports.run = run;
 exports.abort = abort;
 
-window.describe = function(name, fn) {
-    return new Describe(name, fn);
+window.suite = function(name, fn) {
+    return new Suite(name, fn);
 };
 window.setup = setup;
 window.bench = bench;

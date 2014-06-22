@@ -1,4 +1,4 @@
-describe('A suite', function() {
+suite('A suite', function() {
   bench('String#match', function() {
     !! 'Hello world'.match(/o/);
   });
@@ -8,7 +8,7 @@ describe('A suite', function() {
   });
 });
 
-describe('B suite', function(suite) {
+suite('B suite', function(suite) {
   setup(function() {
     suite.text = 'Hello world';
   });
