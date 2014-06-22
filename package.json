@@ -1,7 +1,7 @@
 {
   "name": "astrobench",
   "title": "Astrobench",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Library for JavaScript benchmarks based on Benchmark.js",
   "main": "dist/main.js",
   "directories": {
@@ -9,13 +9,14 @@
   },
   "devDependencies": {
     "browserify": "3.46",
-    "grunt": "0.4.4",
-    "grunt-browserify": "2.0.8",
-    "grunt-contrib-concat": "0.4.0",
-    "grunt-contrib-watch": "0.6.1",
     "jbone": "1.0.16",
     "lodash": "2.4.1",
-    "node-underscorify": "0.0.9"
+    "node-underscorify": "0.0.9",
+    "gulp": "^3.8.1",
+    "gulp-concat": "^2.2.0",
+    "gulp-header": "^1.0.2",
+    "gulp-uglify": "^0.3.1",
+    "vinyl-source-stream": "^0.1.1"
   },
   "keywords": [
     "benchmark",
