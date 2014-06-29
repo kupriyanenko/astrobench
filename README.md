@@ -9,7 +9,7 @@ JavaScript library for running in the browser performance benchmarks, based on B
 
 Easy way to create test cases. Provides rich and pretty UI.
 
-![](https://raw.githubusercontent.com/kupriyanenko/astrobench/gh-pages/astro.png)
+![](https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/astro.png)
 
 ## Installation
 
@@ -87,4 +87,4 @@ $ $EDITOR tests.html
 
 And enjoy the result.
 
-![](https://raw.githubusercontent.com/kupriyanenko/astrobench/gh-pages/screen.png)
+![](https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/screen.png)
