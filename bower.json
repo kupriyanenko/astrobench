@@ -6,7 +6,7 @@
     "kupriyanenko <a.kupriyanenko@gmail.com>"
   ],
   "description": "Library for JavaScript benchmarks based on Benchmark.js",
-  "main": "dist/main.js",
+  "main": "dist/astrobench.js",
   "keywords": [
     "benchmark",
     "benchmark.js",
