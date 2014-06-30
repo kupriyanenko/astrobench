@@ -39,43 +39,48 @@ $ $EDITOR tests.html
   <link rel="stylesheet" href="bower_components/astrobench/src/style.css">
 </head>
 <body>
-  <!-- wrapper for tests -->
+  <!-- Wrapper for tests -->
   <div id="astrobench"></div>
 
   <script src="bower_components/astrobench/dist/astrobench.js"></script>
   <script>
-    // Simple synchronous benchmarks
-    suite('A suite', function() {
-      bench('String#match', function() {
-        !! 'Hello world'.match(/o/);
-      });
+    // A test suite begins with a call to the global function `suite` with two parameters:
+    // a string and a function.
+    // The string is a name or title for a spec suite – usually what is being tested.
+    // The function is a block of code that implements the suite.
+    suite('String matching', function(suite) {
+      var text;
 
-      bench('RegExp#test', function() {
-        !! /o/.test('Hello world');
-      });
-    });
-
-    // Suite with async benchmarks
-    suite('B suite', function(suite) {
-      // Setup for suite, run once
+      // To help a test suite DRY up any duplicated setup code, provides
+      // the global `setup` functions.
+      // As the name implies the `setup` function is called once.
+      // You can store data in `suite` Object, or define necessary variables.
+      // Code from body of the function will be presented in UI.
       setup(function() {
         suite.text = 'Hello world';
+        text = 'Hello world';
       });
 
-      // Benchmark with error, text is not defined
-      bench('Benchmark with error', function() {
+      // Benchmark are defined by calling the global function `bench`,
+      // which, like `suite` takes a string and a function.
+      // The string is the title of the test and the function is the test
+      bench('String#match', function() {
         !! text.match(/o/);
       });
 
-      // Asynchronous benchmark, takes on first argument deferred object
-      bench('Deferred benchmark', function(deferred) {
+      // Async benchmark.
+      // Calls to `bench` can take an optional single argument, Deferred object,
+      // method .resolve() should be called when the async work is complete.
+      bench('RegExp#test async', function(deferred) {
         !! /o/.test(suite.text);
 
+        // Will be done after 100ms
         setTimeout(function() {
           deferred.resolve();
         }, 100);
       },
       // Options for current benchmark
+      // See more on http://benchmarkjs.com/docs#options
       {
         defer: true
       });
