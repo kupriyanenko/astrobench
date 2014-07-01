@@ -68,13 +68,14 @@ $ $EDITOR tests.html
         !! text.match(/o/);
       });
 
+      bench('RegExp#test', function() {
+        !! /o/.test(suite.text);
+      });
+
       // Async benchmark.
       // Calls to `bench` can take an optional single argument, Deferred object,
       // method .resolve() should be called when the async work is complete.
-      bench('RegExp#test async', function(deferred) {
-        !! /o/.test(suite.text);
-
-        // Will be done after 100ms
+      bench('Async#test', function(deferred) {
         setTimeout(function() {
           deferred.resolve();
         }, 100);
@@ -92,4 +93,4 @@ $ $EDITOR tests.html
 
 And enjoy the result.
 
-![](https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/screen.png)
+![](https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/sample.png)
