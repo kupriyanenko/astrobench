@@ -13,5 +13,8 @@
     "speed",
     "performance"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "benchmark": "~1.0.0"
+  }
 }

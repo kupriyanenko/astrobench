@@ -36,7 +36,7 @@ gulp.task('browserify', function() {
 });
 
 gulp.task('build', ['browserify'], function() {
-  return gulp.src(['./dist/astrobench.js', './vendors/benchmark.js'])
+  return gulp.src(['./dist/astrobench.js', './vendor/benchmark/benchmark.js'])
     .pipe(concat('astrobench.js'))
     .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
