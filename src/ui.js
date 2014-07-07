@@ -100,7 +100,9 @@ var onSuiteComplete = function(event, suite) {
     if (event.target.aborted) return;
 
     var fastest = this.filter('fastest'),
-        delta, $bench;
+        delta,
+        hz,
+        $bench;
 
     this.forEach(function(bench) {
         if (bench.stats.rme === 0) return;
@@ -113,7 +115,15 @@ var onSuiteComplete = function(event, suite) {
             return;
         }
 
-        delta = (Math.abs(bench.hz - fastest.pluck('hz')) / fastest.pluck('hz') * 100).toFixed(2);
+        if (fastest.length > 1) {
+            hz = fastest.pluck('hz').reduce(function(memo, num) {
+                return memo + num;
+            }, 0) / fastest.length;
+        } else {
+            hz = fastest.pluck('hz');
+        }
+
+        delta = (Math.abs(bench.hz - hz) / hz * 100).toFixed(2);
         $bench[0].classList.remove('fastest');
         $bench.find('.fn-bench-status').html('(' + delta + '% slower)');
     });
