@@ -7765,7 +7765,7 @@ var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments
 with(obj||{}){
 __p+='<div class="bench" id="bench-'+
 ((__t=( bench.id ))==null?'':__t)+
-'">\n\t<div class="bench-title fn-show-source">\n\t\t<h2 class="bench-title-text">\n\t\t\t<div>'+
+'">\n\t<div class="bench-background"></div>\n\t<div class="bench-title fn-show-source">\n\t\t<h2 class="bench-title-text">\n\t\t\t<div>'+
 ((__t=( bench.name ))==null?'':__t)+
 '</div>\n\t\t\t<span class="fn-bench-state bench-state">ready</span>\n\t\t\t<span class="fn-bench-result bench-result"></span>\n\t\t\t<span class="fn-bench-status bench-status"></span>\n\t\t</h2>\n\t\t<div class="bench-controls">\n\t\t\t<a href="#" class="fn-run-bench">'+
 ((__t=( dictionary.runBenchmark ))==null?'':__t)+
@@ -7930,6 +7930,7 @@ var onSuiteComplete = function(event, suite) {
         delta = (Math.abs(bench.hz - fastest.pluck('hz')) / fastest.pluck('hz') * 100).toFixed(2);
         $bench[0].classList.remove('fastest');
         $bench.find('.fn-bench-status').html('(' + delta + '% slower)');
+        $bench.find('.bench-background').css('width', ((bench.hz / fastest.pluck('hz')) * 100) + '%');
     });
 };
 

@@ -92,8 +92,11 @@ body {
 /* Benchmark */
 #astrobench .bench {
 	margin: 0 0 0.75em;
+	position: relative;
 }
 #astrobench .bench-title {
+	position: relative;
+	z-index: 100;
 	border: 1px solid #DDD;
 	overflow: hidden;
 	line-height: 1.5em;
@@ -110,6 +113,16 @@ body {
 #astrobench .bench-title-text {
 	float: left;
 }
+#astrobench .bench-background {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height:  100%;
+	width:0%;
+	background-color: #DFF0D8;
+	z-index: 50;
+}
+
 #astrobench .bench-controls {
 	float: right;
 }
@@ -124,6 +137,8 @@ body {
 	border-radius: 3px 3px 0 0;
 }
 #astrobench .bench.opened .bench-source {
+	position:relative;
+	z-index:100;
 	border-radius: 0 0 3px 3px;
 	margin: 0;
 	border-top: 0;
