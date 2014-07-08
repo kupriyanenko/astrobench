@@ -126,6 +126,7 @@ var onSuiteComplete = function(event, suite) {
         delta = (Math.abs(bench.hz - hz) / hz * 100).toFixed(2);
         $bench[0].classList.remove('fastest');
         $bench.find('.fn-bench-status').html('(' + delta + '% slower)');
+        $bench.find('.bench-background').css('width', ((bench.hz / fastest.pluck('hz')) * 100) + '%');
     });
 };
 
