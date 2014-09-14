@@ -7897,8 +7897,11 @@ var onBenchComplete = function(event, suite) {
             return $bench.find('.fn-bench-state').html('aborted');
         }
 
-        result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ' + pm +
-            stats.rme.toFixed(2) + '%';
+        result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ';
+        if (hz < 500) {
+            result += (stats.mean * 1000).toFixed(1) + 'ms ';
+        }
+        result += pm + stats.rme.toFixed(2) + '%';
     }
 
     if (suite && suite.suite.running === false) {
