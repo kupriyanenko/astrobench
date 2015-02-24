@@ -1,7 +1,7 @@
 # Astrobench
 
-[![NPM version](https://badge.fury.io/js/astrobench.png)](http://badge.fury.io/js/astrobench)
-[![Bower version](https://badge.fury.io/bo/astrobench.png)](http://badge.fury.io/bo/astrobench)
+[![NPM version](https://badge.fury.io/js/astrobench.svg)](http://badge.fury.io/js/astrobench)
+[![Bower version](https://badge.fury.io/bo/astrobench.svg)](http://badge.fury.io/bo/astrobench)
 
 > Make the Web Faster
 
