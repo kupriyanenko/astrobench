@@ -5,11 +5,11 @@
 
 > Make the Web Faster
 
-JavaScript library for running in the browser performance benchmarks, based on Benchmark.js. [Live Demo](https://kupriyanenko.github.io/astrobench/demo.html)
+JavaScript library for running in the browser performance benchmarks, based on Benchmark.js. [Live Demo](http://astrobench.js.org/)
 
 Easy way to create test cases. Provides rich and pretty UI.
 
-![](https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/astro.png)
+[![astro.png][2]][1]
 
 ## Installation
 
@@ -93,4 +93,8 @@ $ $EDITOR tests.html
 
 And enjoy the result.
 
-![](https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/sample.png)
+[![sample.png][3]][1]
+
+[1]: http://astrobench.js.org
+[2]: https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/astro.png
+[3]: https://cdn.rawgit.com/kupriyanenko/astrobench/gh-pages/sample.png
