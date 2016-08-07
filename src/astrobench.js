@@ -1,5 +1,9 @@
-var _ = require('lodash'),
-    ui = require('./ui');
+var _ = require('lodash');
+var Benchmark = require('benchmark');
+
+var ui = require('./ui');
+
+window.Benchmark = Benchmark;
 
 var state = {
     describes: [],
@@ -16,13 +20,9 @@ var Suite = function(name, fn) {
 
     this.id = _.uniqueId('suite');
     this.sandbox = {};
-    this.suite = new Benchmark.Suite({
-        name: name
-    });
+    this.suite = new Benchmark.Suite(name);
 
-    setTimeout(function() {
-        ui.drawSuite(this);
-    }.bind(this));
+    setTimeout(ui.drawSuite.bind(this, this));
 
     fn(this.sandbox);
 };
@@ -30,20 +30,26 @@ var Suite = function(name, fn) {
 Suite.prototype = {
     setup: function(fn) {
         this.setupFn = fn;
-        fn.call(this, this);
+    },
+
+    after: function(fn) {
+        this.afterFn = fn;
     },
 
     add: function(name, fn, options) {
-        var suite = this;
-        var bench = new Benchmark(name, fn, options);
+        if (this.setupFn || this.afterFn) {
+            options = _.extend({}, options, {
+                onStart: this.setupFn,
+                onComplete: this.afterFn
+            });
+        }
+
+        var bench = _.last(this.suite.add(name, fn, options));
 
         bench.originFn = fn;
         bench.originOption = options;
 
-        setTimeout(function() {
-            ui.drawBench(this, bench);
-            this.suite.add(bench);
-        }.bind(this));
+        setTimeout(ui.drawBench.bind(this, this, bench));
     },
 
     run: function() {
@@ -76,6 +82,10 @@ var bench = function(name, fn, options) {
 
 var setup = function(fn) {
     state.currentSuite.setup(fn);
+};
+
+var after = function(fn) {
+    state.currentSuite.after(fn);
 };
 
 var run = function(options) {
@@ -117,4 +127,5 @@ window.suite = function(name, fn) {
 };
 window.setup = setup;
 window.bench = bench;
+window.after = after;
 window.astrobench = run;

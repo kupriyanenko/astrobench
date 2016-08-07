@@ -1,73 +1,42 @@
-var $ = require('jbone'),
-    _ = require('lodash'),
-    astrobench = require('./astrobench')
-    tmplApp = require('./templates/app.html'),
-    tmplSuite = require('./templates/suite.html'),
-    tmplBench = require('./templates/bench.html');
+var $ = require('jbone');
+var Benchmark = require('benchmark');
 
-var dictionary = {
-    runSuite: 'Run suite',
-    stopSuite: 'Stop suite',
-    runBenchmark: 'Run benchmark',
-    stopBenchmark: 'Stop benchmark',
-    runAll: 'Run all tests',
-    stopAll: 'Stop all tests'
-};
+var astrobench = require('./astrobench');
+var dictionary = require('./translations');
+var util = require('./util');
+
+var tmplApp = require('./templates/app.html');
+var tmplSuite = require('./templates/suite.html');
+var tmplBench = require('./templates/bench.html');
 
 $('#astrobench').html(tmplApp({
     dictionary: dictionary
 }));
 
-$('.fn-run-tests').on('click', function(e) {
+var $runButton = $('.fn-run-tests');
+
+$runButton.on('click', function(e) {
     e.preventDefault();
 
     astrobench.abort();
 
-    $('.fn-run-tests').html(dictionary.stopAll);
+    $runButton.html(dictionary.stopAll);
 
     if (!astrobench.state.running) {
         astrobench.run({
             onStop: function() {
-                $('.fn-run-tests').html(dictionary.runAll);
+                $runButton.html(dictionary.runAll);
             }
         });
     }
 });
 
-var hilite = function(str) {
-    return str
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\/\/(.*)/gm, '<span class="comment">//$1</span>')
-        .replace(/('.*?')/gm, '<span class="string">$1</span>')
-        .replace(/(\d+\.\d+)/gm, '<span class="number">$1</span>')
-        .replace(/(\d+)/gm, '<span class="number">$1</span>')
-        .replace(/\bnew *(\w+)/gm, '<span class="keyword">new</span> <span class="init">$1</span>')
-        .replace(/\b(function|new|throw|return|var|if|else)\b/gm, '<span class="keyword">$1</span>');
-};
-
-var fnstrip = function(fn) {
-    str = fn.toString()
-        .replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/^\uFEFF/, '')
-        .replace(/^function *\(.*\) *{/, '')
-        .replace(/\s+\}$/, '');
-
-    var spaces = str.match(/^\n?( *)/)[1].length,
-        tabs = str.match(/^\n?(\t*)/)[1].length,
-        re = new RegExp('^\n?' + (tabs ? '\t' : ' ') + '{' + (tabs ? tabs : spaces) + '}', 'gm');
-
-    str = str.replace(re, '');
-
-    return str.trim();
-};
-
 var onBenchComplete = function(event, suite) {
     var me = event.target,
         error = me.error,
         hz = me.hz,
-        id = me.id,
         stats = me.stats,
-        pm = Benchmark.support.java ? '+/-' : '\xb1',
+        id = me.id,
         result = '',
         $bench = $('#bench-' + id),
         $results = $bench.find('.fn-bench-result');
@@ -76,8 +45,8 @@ var onBenchComplete = function(event, suite) {
 
     if (error) {
         result += error.toString();
-        $bench[0].classList.add('warning');
-        $results[0].classList.add('error');
+        $bench.addClass('warning');
+        $results.addClass('error');
     } else {
         if (me.aborted) {
             return $bench.find('.fn-bench-state').html('aborted');
@@ -87,7 +56,7 @@ var onBenchComplete = function(event, suite) {
         if (hz < 500) {
             result += (stats.mean * 1000).toFixed(1) + 'ms ';
         }
-        result += pm + stats.rme.toFixed(2) + '%';
+        result += '±' + stats.rme.toFixed(2) + '%';
     }
 
     if (suite && suite.suite.running === false) {
@@ -119,15 +88,15 @@ var onSuiteComplete = function(event, suite) {
         }
 
         if (fastest.length > 1) {
-            hz = fastest.pluck('hz').reduce(function(memo, num) {
-                return memo + num;
+            hz = fastest.reduce(function(memo, bench) {
+                return memo + bench.hz;
             }, 0) / fastest.length;
         } else {
-            hz = fastest.pluck('hz');
+            hz = fastest[0].hz;
         }
 
         delta = (Math.abs(bench.hz - hz) / hz * 100).toFixed(2);
-        $bench[0].classList.remove('fastest');
+        $bench.removeClass('fastest');
         $bench.find('.fn-bench-status').html('(' + delta + '% slower)');
         $bench.find('.bench-background').css('width', ((bench.hz / hz) * 100) + '%');
     });
@@ -135,8 +104,8 @@ var onSuiteComplete = function(event, suite) {
 
 exports.drawSuite = function(suite) {
     suite.$el = $(tmplSuite({
-        fnstrip: fnstrip,
-        hilite: hilite,
+        fnstrip: util.fnstrip,
+        hilite: util.hilite,
         suite: suite,
         dictionary: dictionary
     }));
@@ -168,8 +137,8 @@ exports.drawSuite = function(suite) {
 exports.drawBench = function(suite, bench) {
     var $bench = $(tmplBench({
             bench: bench,
-            fnstrip: fnstrip,
-            hilite: hilite,
+            fnstrip: util.fnstrip,
+            hilite: util.hilite,
             dictionary: dictionary
         })),
         // cache state Node for fast writing
@@ -189,21 +158,21 @@ exports.drawBench = function(suite, bench) {
         })
         .on('click', '.fn-show-source', function(e) {
             if (e.defaultPrevented) return;
-            $bench[0].classList.toggle('opened');
+            $bench.toggleClass('opened');
         });
 
     // benchmark event binding
     bench
         .on('start', function(event) {
-            $bench[0].classList.remove('fastest');
-            $bench[0].classList.remove('warning');
+            $bench.removeClass('fastest');
+            $bench.removeClass('warning');
             $bench.find('.fn-bench-status, .fn-bench-result').html('');
             $bench.find('.fn-run-bench').html(dictionary.stopBenchmark);
 
             event.target.off('complete', onComplete);
             event.target.on('complete', onComplete);
         })
-        .on('cycle', function() {
-            $state.html(Benchmark.formatNumber(this.count) + ' (' + this.stats.sample.length + ' samples)');
+        .on('cycle', function(event) {
+            $state.html(Benchmark.formatNumber(event.target.count) + ' (' + event.target.stats.sample.length + ' samples)');
         });
 };
