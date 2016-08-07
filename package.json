@@ -7,17 +7,19 @@
   "directories": {
     "example": "examples"
   },
-  "devDependencies": {
-    "benchmark": "1.0.0",
-    "browserify": "3.46",
-    "gulp": "^3.8.1",
-    "gulp-concat": "^2.2.0",
-    "gulp-header": "^1.0.2",
-    "gulp-uglify": "^0.3.1",
-    "jbone": "1.0.16",
+  "dependencies": {
+    "benchmark": "2.1.1",
+    "browserify": "13.1.0",
+    "gulp": "3.9.1",
+    "gulp-concat": "2.6.0",
+    "gulp-header": "1.8.7",
+    "gulp-uglify": "2.0.0",
+    "jbone": "1.2.0",
     "lodash": "2.4.1",
-    "node-underscorify": "0.0.9",
-    "vinyl-source-stream": "^0.1.1"
+    "node-underscorify": "0.0.14",
+    "vinyl-source-stream": "0.1.1",
+    "gulp-sourcemaps": "1.6.0",
+    "vinyl-buffer": "1.0.0"
   },
   "keywords": [
     "benchmark",
@@ -31,5 +33,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/kupriyanenko/astrobench"
+  },
+  "browserify": {
+      "transform": ["node-underscorify"]
   }
 }

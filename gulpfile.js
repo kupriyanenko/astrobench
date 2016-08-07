@@ -1,9 +1,11 @@
 var gulp = require('gulp');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 var header = require('gulp-header');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
 
 var pkg = require('./package.json');
 var banner = ['/*!',
@@ -24,22 +26,21 @@ gulp.task('dev', function() {
 });
 
 gulp.task('browserify', function() {
-  return browserify({entries:'./src/ui.js'})
-    .transform('node-underscorify')
-    .bundle(browserifyConfig)
+  return browserify(Object.assign({entries:'./src/ui.js'}, browserifyConfig))
+    .bundle()
+    .pipe(source('astrobench.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(header(banner, {pkg: pkg}))
     .on('error', function (err) {
-      console.log(err.toString());
       this.emit('end');
     })
-    .pipe(source('astrobench.js'))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('./dist/'));
 });
 
 gulp.task('build', ['browserify'], function() {
-  return gulp.src(['./dist/astrobench.js', './node_modules/benchmark/benchmark.js'])
-    .pipe(concat('astrobench.js'))
-    .pipe(header(banner, {pkg: pkg}))
-    .pipe(gulp.dest('./dist/'))
+  return gulp.src('./dist/astrobench.js')
     .pipe(uglify({preserveComments: 'some'}))
     .pipe(concat('astrobench.min.js'))
     .pipe(gulp.dest('./dist/'));
@@ -48,5 +49,5 @@ gulp.task('build', ['browserify'], function() {
 gulp.task('default', ['build']);
 
 gulp.task('watch', function() {
-  gulp.watch(['src/**/*.js', 'src/**/*.html'], ['dev', 'build']);
+  gulp.watch(['src/**/*.js', 'src/**/*.html'], ['dev', 'browserify']);
 });
