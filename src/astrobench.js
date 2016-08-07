@@ -5,6 +5,8 @@ var ui = require('./ui');
 
 window.Benchmark = Benchmark;
 
+var globalOptions = {};
+
 var state = {
     describes: [],
     currentSuite: null,
@@ -37,8 +39,8 @@ Suite.prototype = {
     },
 
     add: function(name, fn, options) {
-        if (this.setupFn || this.afterFn) {
-            options = _.extend({}, options, {
+        if (this.setupFn || this.afterFn || !_.isEmpty(globalOptions)) {
+            options = _.extend({}, options, globalOptions, {
                 onStart: this.setupFn,
                 onComplete: this.afterFn
             });
@@ -110,6 +112,10 @@ var run = function(options) {
     }
 };
 
+run.options = function(options) {
+    _.assign(globalOptions, options);
+};
+
 var abort = function() {
     state.describes[state.index].suite.abort();
 
@@ -128,4 +134,5 @@ window.suite = function(name, fn) {
 window.setup = setup;
 window.bench = bench;
 window.after = after;
+
 window.astrobench = run;
