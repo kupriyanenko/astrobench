@@ -8,18 +8,18 @@
     "example": "examples"
   },
   "dependencies": {
-    "benchmark": "2.1.1",
-    "browserify": "13.1.0",
-    "gulp": "3.9.1",
-    "gulp-concat": "2.6.0",
-    "gulp-header": "1.8.7",
-    "gulp-uglify": "2.0.0",
-    "jbone": "1.2.0",
-    "lodash": "2.4.1",
+    "benchmark": "2.1.4",
+    "browserify": "16.5.0",
+    "gulp": "4.0.2",
+    "gulp-concat": "2.6.1",
+    "gulp-header": "2.0.9",
+    "gulp-uglify": "3.0.2",
+    "jbone": "1.2.1",
+    "lodash": "4.17.15",
     "node-underscorify": "0.0.14",
-    "vinyl-source-stream": "0.1.1",
-    "gulp-sourcemaps": "1.6.0",
-    "vinyl-buffer": "1.0.0"
+    "vinyl-source-stream": "2.0.0",
+    "gulp-sourcemaps": "2.6.5",
+    "vinyl-buffer": "1.0.1"
   },
   "keywords": [
     "benchmark",
@@ -35,6 +35,8 @@
     "url": "https://github.com/kupriyanenko/astrobench"
   },
   "browserify": {
-      "transform": ["node-underscorify"]
+    "transform": [
+      "node-underscorify"
+    ]
   }
 }
