@@ -12,14 +12,15 @@
     "browserify": "16.5.0",
     "gulp": "4.0.2",
     "gulp-concat": "2.6.1",
+    "gulp-csso": "4.0.1",
     "gulp-header": "2.0.9",
+    "gulp-sourcemaps": "2.6.5",
     "gulp-uglify": "3.0.2",
     "jbone": "1.2.1",
     "lodash": "4.17.15",
     "node-underscorify": "0.0.14",
-    "vinyl-source-stream": "2.0.0",
-    "gulp-sourcemaps": "2.6.5",
-    "vinyl-buffer": "1.0.1"
+    "vinyl-buffer": "1.0.1",
+    "vinyl-source-stream": "2.0.0"
   },
   "keywords": [
     "benchmark",

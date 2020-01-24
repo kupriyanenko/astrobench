@@ -1,10 +1,11 @@
-const { task, series, src, dest, watch } = require('gulp');
+const { task, series, parallel, src, dest, watch } = require('gulp');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const header = require('gulp-header');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
+const csso = require('gulp-csso');
 const sourcemaps = require('gulp-sourcemaps');
 
 const pkg = require('./package.json');
@@ -41,7 +42,21 @@ task('uglify', () =>
     .pipe(concat('astrobench.min.js'))
     .pipe(dest('./dist/')));
 
-task('default', series('browserify', 'uglify'));
+task('copy-style', () =>
+  src('./src/style.css')
+    .pipe(concat('astrobench.css'))
+    .pipe(dest('./dist/')));
+
+task('minify-style', () =>
+  src('./dist/astrobench.css')
+    .pipe(sourcemaps.init())
+    .pipe(csso())
+    .pipe(sourcemaps.write('./'))
+    .pipe(dest('./dist/')));
+
+task('default', parallel(
+  series('browserify', 'uglify'), series('copy-style', 'minify-style')));
 
 task('watch', () =>
-  watch(['src/**/*.js', 'src/**/*.html'], series('dev', 'browserify')));
+  watch(['src/**/*.js', 'src/**/*.css', 'src/**/*.html'],
+    parallel(series('dev', 'browserify'), 'copy-style')));
