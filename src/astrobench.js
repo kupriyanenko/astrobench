@@ -43,6 +43,8 @@ var Suite = function(name, fn) {
     this.id = _.uniqueId('suite');
     this.sandbox = {};
     this.suite = new Benchmark.Suite(name);
+    this.beforeSuiteListeners = new Listeners();
+    this.afterSuiteListeners = new Listeners();
     this.beforeBenchListeners = new Listeners();
     this.afterBenchListeners = new Listeners();
 
@@ -60,6 +62,14 @@ Suite.prototype = {
     after: function(fn) {
         deprecate('after', 'afterBench');
         this.afterFn = fn;
+    },
+
+    beforeSuite: function(fn) {
+        this.beforeSuiteListeners.add(fn);
+    },
+
+    afterSuite: function(fn) {
+        this.afterSuiteListeners.add(fn);
     },
 
     beforeBench: function(fn) {

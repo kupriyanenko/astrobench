@@ -7,16 +7,28 @@
 	</div>
 	<div class="suite-setup hidden">
 		<% if(suite.setupFn) { %>
-		<pre><code><%= hilite('// Preparation code\n') + hilite(fnstrip(suite.setupFn)) %></code></pre>
-		<% } else if(suite.beforeBenchListeners.callbacks.length) { %>
+		<pre><code><%= hilite('// Preparation code (deprecated)\n') + hilite(fnstrip(suite.setupFn)) %></code></pre>
+		<% } %>
+		<% if (suite.beforeSuiteListeners.callbacks.length) { %>
 		<pre><code><%=
-			hilite('// Preparation code\n') +
+			hilite('// Suite preparation code\n') +
+			suite.beforeSuiteListeners.callbacks
+				.map(function (callback) {
+					return hilite(fnstrip(callback));
+				})
+				.join('\n') %></code></pre>
+		<% } %>
+		<% if (suite.beforeBenchListeners.callbacks.length) { %>
+		<pre><code><%=
+			hilite('// Benchmark preparation code\n') +
 			suite.beforeBenchListeners.callbacks
 				.map(function (callback) {
 					return hilite(fnstrip(callback));
 				})
 				.join('\n') %></code></pre>
-		<% } else { %>
+		<% } %>
+		<% if (!(suite.setupFn || suite.beforeSuiteListeners.callbacks.length ||
+					   suite.beforeBenchListeners.callbacks.length)) { %>
 		<pre><code><%= hilite('// No preparation code') %></code></pre>
 		<% } %>
 	</div>
