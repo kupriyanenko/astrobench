@@ -9,7 +9,7 @@ suite('A suite', function() {
 });
 
 suite('B suite', function(suite) {
-  setup(function() {
+  beforeBench(function() {
     suite.text = 'Hello world';
   });
 

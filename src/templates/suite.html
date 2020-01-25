@@ -8,6 +8,14 @@
 	<div class="suite-setup hidden">
 		<% if(suite.setupFn) { %>
 		<pre><code><%= hilite('// Preparation code\n') + hilite(fnstrip(suite.setupFn)) %></code></pre>
+		<% } else if(suite.beforeBenchListeners.callbacks.length) { %>
+		<pre><code><%=
+			hilite('// Preparation code\n') +
+			suite.beforeBenchListeners.callbacks
+				.map(function (callback) {
+					return hilite(fnstrip(callback));
+				})
+				.join('\n') %></code></pre>
 		<% } else { %>
 		<pre><code><%= hilite('// No preparation code') %></code></pre>
 		<% } %>
