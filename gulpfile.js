@@ -21,7 +21,10 @@ const banner = `/*!
 
 let browserifyConfig = { debug: false };
 
-task('dev', () => (browserifyConfig = { debug: true }));
+task('dev', done => {
+  browserifyConfig = { debug: true };
+  done();
+});
 
 task('browserify', () =>
   browserify(Object.assign({ entries: './src/ui.js' }, browserifyConfig))
@@ -30,7 +33,7 @@ task('browserify', () =>
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(header(banner, { pkg: pkg }))
-    .on('error', err => this.emit('end'))
+    .on('error', () => this.emit('end'))
     .pipe(sourcemaps.write('./'))
     .pipe(dest('./dist/')));
 
@@ -57,6 +60,7 @@ task('minify-style', () =>
 task('default', parallel(
   series('browserify', 'uglify'), series('copy-style', 'minify-style')));
 
-task('watch', () =>
-  watch(['src/**/*.js', 'src/**/*.css', 'src/**/*.html'],
-    parallel(series('dev', 'browserify'), 'copy-style')));
+task('watch', () => {
+  watch(['src/**/*.js', 'src/**/*.html'], series('dev', 'browserify'));
+  watch('src/**/*.css', series('copy-style'));
+});
