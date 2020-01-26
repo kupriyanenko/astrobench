@@ -112,7 +112,7 @@ var run = function(options) {
     }
 };
 
-run.options = function(options) {
+var options = function(options) {
     _.assign(globalOptions, options);
 };
 
@@ -123,6 +123,10 @@ var abort = function() {
         state.aborted = true;
     }
 };
+
+run.options = options;
+run.state = state;
+run.abort = abort;
 
 exports.state = state;
 exports.run = run;
