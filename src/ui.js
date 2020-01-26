@@ -39,7 +39,10 @@ var onBenchComplete = function(event, suite) {
         id = me.id,
         result = '',
         $bench = $('#bench-' + id),
-        $results = $bench.find('.fn-bench-result');
+        $results = $bench.find('.fn-bench-result'),
+        ops,
+        mean,
+        rme;
 
     $bench.find('.fn-run-bench').html(dictionary.runBenchmark);
 
@@ -52,11 +55,15 @@ var onBenchComplete = function(event, suite) {
             return $bench.find('.fn-bench-state').html('aborted');
         }
 
-        result += ' x ' + Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0)) + ' ops/sec ';
+        ops = Benchmark.formatNumber(hz.toFixed(hz < 100 ? 2 : 0));
+        result += ' x ' + ops + ' ops/sec ';
         if (hz < 500) {
-            result += (stats.mean * 1000).toFixed(1) + 'ms ';
+            mean = (stats.mean * 1000).toFixed(1);
+            result += mean + 'ms ';
         }
-        result += '±' + stats.rme.toFixed(2) + '%';
+        rme = stats.rme.toFixed(2);
+        result += '±' + rme + '%';
+        me.sum = { ops: ops, mean: mean, rme:rme }
     }
 
     if (suite && suite.suite.running === false) {
@@ -82,6 +89,7 @@ var onSuiteComplete = function(event, suite) {
         $bench = $('#bench-' + bench.id);
 
         if (fastest.indexOf(bench) !== -1) {
+            bench.sum.fastest = true;
             $bench[0].classList.add('fastest');
             $bench.find('.fn-bench-status').html('(fastest)');
             return;
@@ -96,6 +104,7 @@ var onSuiteComplete = function(event, suite) {
         }
 
         delta = (Math.abs(bench.hz - hz) / hz * 100).toFixed(2);
+        bench.sum.delta = delta;
         $bench.removeClass('fastest');
         $bench.find('.fn-bench-status').html('(' + delta + '% slower)');
         $bench.find('.bench-background').css('width', ((bench.hz / hz) * 100) + '%');
