@@ -184,9 +184,11 @@ window.suite = function(name, fn) {
     return new Suite(name, fn);
 };
 window.setup = setup;
+window.beforeSuite = beforeSuite;
 window.beforeBench = beforeBench;
 window.bench = bench;
 window.after = after;
+window.afterSuite = afterSuite;
 window.afterBench = afterBench;
 
 window.astrobench = run;
