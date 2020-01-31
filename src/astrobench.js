@@ -134,6 +134,14 @@ var after = function(fn) {
     state.currentSuite.after(fn);
 };
 
+var beforeSuite = function(fn) {
+    state.currentSuite.beforeSuite(fn);
+};
+
+var afterSuite = function(fn) {
+    state.currentSuite.afterSuite(fn);
+};
+
 var beforeBench = function(fn) {
     state.currentSuite.beforeBench(fn);
 };
