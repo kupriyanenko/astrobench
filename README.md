@@ -36,13 +36,13 @@ $ $EDITOR tests.html
 <head>
   <meta charset="UTF-8">
   <title>Performance tests</title>
-  <link rel="stylesheet" href="bower_components/astrobench/src/style.css">
+  <link rel="stylesheet" href="bower_components/astrobench/dist/astrobench.min.css">
 </head>
 <body>
   <!-- Wrapper for tests -->
   <div id="astrobench"></div>
 
-  <script src="bower_components/astrobench/dist/astrobench.js"></script>
+  <script src="bower_components/astrobench/dist/astrobench.min.js"></script>
   <script>
     // A test suite begins with a call to the global function `suite` with two parameters:
     // a string and a function.

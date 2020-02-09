@@ -1,10 +1,11 @@
-const { task, series, src, dest, watch } = require('gulp');
+const { task, series, parallel, src, dest, watch } = require('gulp');
 const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const header = require('gulp-header');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
+const csso = require('gulp-csso');
 const sourcemaps = require('gulp-sourcemaps');
 
 const pkg = require('./package.json');
@@ -20,7 +21,10 @@ const banner = `/*!
 
 let browserifyConfig = { debug: false };
 
-task('dev', () => (browserifyConfig = { debug: true }));
+task('dev', done => {
+  browserifyConfig = { debug: true };
+  done();
+});
 
 task('browserify', () =>
   browserify(Object.assign({ entries: './src/ui.js' }, browserifyConfig))
@@ -29,7 +33,7 @@ task('browserify', () =>
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(header(banner, { pkg: pkg }))
-    .on('error', err => this.emit('end'))
+    .on('error', () => this.emit('end'))
     .pipe(sourcemaps.write('./'))
     .pipe(dest('./dist/')));
 
@@ -41,7 +45,22 @@ task('uglify', () =>
     .pipe(concat('astrobench.min.js'))
     .pipe(dest('./dist/')));
 
-task('default', series('browserify', 'uglify'));
+task('copy-style', () =>
+  src('./src/style.css')
+    .pipe(concat('astrobench.css'))
+    .pipe(dest('./dist/')));
 
-task('watch', () =>
-  watch(['src/**/*.js', 'src/**/*.html'], series('dev', 'browserify')));
+task('minify-style', () =>
+  src('./dist/astrobench.css')
+    .pipe(sourcemaps.init())
+    .pipe(csso())
+    .pipe(sourcemaps.write('./'))
+    .pipe(dest('./dist/')));
+
+task('default', parallel(
+  series('browserify', 'uglify'), series('copy-style', 'minify-style')));
+
+task('watch', () => {
+  watch(['src/**/*.js', 'src/**/*.html'], series('dev', 'browserify'));
+  watch('src/**/*.css', series('copy-style'));
+});
