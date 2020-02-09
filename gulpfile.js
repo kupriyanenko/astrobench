@@ -1,53 +1,47 @@
-var gulp = require('gulp');
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var header = require('gulp-header');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
+const { task, series, src, dest, watch } = require('gulp');
+const browserify = require('browserify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const header = require('gulp-header');
+const concat = require('gulp-concat');
+const uglify = require('gulp-uglify');
+const sourcemaps = require('gulp-sourcemaps');
 
-var pkg = require('./package.json');
-var banner = ['/*!',
-  ' * <%= pkg.title %> - <%= pkg.version %>',
-  ' * <%= pkg.description %>',
-  ' *',
-  ' * <%= pkg.homepage %>',
-  ' *',
-  ' * Copyright <%= pkg.author %>',
-  ' * Released under the <%= pkg.license %> license.',
-  ' */',
-  ''].join('\n');
+const pkg = require('./package.json');
+const banner = `/*!
+ * <%= pkg.title %> - <%= pkg.version %>
+ * <%= pkg.description %>
+ *
+ * <%= pkg.homepage %>
+ *
+ * Copyright <%= pkg.author %>
+ * Released under the <%= pkg.license %> license.
+ */`
 
-var browserifyConfig = {debug: false};
+let browserifyConfig = { debug: false };
 
-gulp.task('dev', function() {
-  browserifyConfig = {debug: true};
-});
+task('dev', () => (browserifyConfig = { debug: true }));
 
-gulp.task('browserify', function() {
-  return browserify(Object.assign({entries:'./src/ui.js'}, browserifyConfig))
+task('browserify', () =>
+  browserify(Object.assign({ entries: './src/ui.js' }, browserifyConfig))
     .bundle()
     .pipe(source('astrobench.js'))
     .pipe(buffer())
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(header(banner, {pkg: pkg}))
-    .on('error', function (err) {
-      this.emit('end');
-    })
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(header(banner, { pkg: pkg }))
+    .on('error', err => this.emit('end'))
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('./dist/'));
-});
+    .pipe(dest('./dist/')));
 
-gulp.task('build', ['browserify'], function() {
-  return gulp.src('./dist/astrobench.js')
-    .pipe(uglify({preserveComments: 'some'}))
+task('uglify', () =>
+  src('./dist/astrobench.js')
+    .pipe(uglify({
+      output: { comments: 'some' }
+    }))
     .pipe(concat('astrobench.min.js'))
-    .pipe(gulp.dest('./dist/'));
-});
+    .pipe(dest('./dist/')));
 
-gulp.task('default', ['build']);
+task('default', series('browserify', 'uglify'));
 
-gulp.task('watch', function() {
-  gulp.watch(['src/**/*.js', 'src/**/*.html'], ['dev', 'browserify']);
-});
+task('watch', () =>
+  watch(['src/**/*.js', 'src/**/*.html'], series('dev', 'browserify')));
