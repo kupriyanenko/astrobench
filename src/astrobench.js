@@ -15,6 +15,26 @@ var state = {
     index: 0
 };
 
+var deprecate = function(oldName, newName) {
+    console.log('The function "' + oldName + '" is deprecated. Use "' +
+        newName + '" instead.');
+}
+
+var Listeners = function() {
+    this.callbacks = [];
+    this.runner = this.run.bind(this);
+};
+
+Listeners.prototype.add = function(callback) {
+    this.callbacks.push(callback);
+}
+
+Listeners.prototype.run = function() {
+    this.callbacks.forEach(function (callback) {
+        callback();
+    });
+}
+
 var Suite = function(name, fn) {
     // update global state
     state.describes.push(this);
@@ -23,6 +43,10 @@ var Suite = function(name, fn) {
     this.id = _.uniqueId('suite');
     this.sandbox = {};
     this.suite = new Benchmark.Suite(name);
+    this.beforeSuiteListeners = new Listeners();
+    this.afterSuiteListeners = new Listeners();
+    this.beforeBenchListeners = new Listeners();
+    this.afterBenchListeners = new Listeners();
 
     setTimeout(ui.drawSuite.bind(this, this));
 
@@ -31,11 +55,29 @@ var Suite = function(name, fn) {
 
 Suite.prototype = {
     setup: function(fn) {
+        deprecate('setup', 'beforeBench');
         this.setupFn = fn;
     },
 
     after: function(fn) {
+        deprecate('after', 'afterBench');
         this.afterFn = fn;
+    },
+
+    beforeSuite: function(fn) {
+        this.beforeSuiteListeners.add(fn);
+    },
+
+    afterSuite: function(fn) {
+        this.afterSuiteListeners.add(fn);
+    },
+
+    beforeBench: function(fn) {
+        this.beforeBenchListeners.add(fn);
+    },
+
+    afterBench: function(fn) {
+        this.afterBenchListeners.add(fn);
     },
 
     add: function(name, fn, options) {
@@ -50,6 +92,8 @@ Suite.prototype = {
 
         bench.originFn = fn;
         bench.originOption = options;
+        bench.on('start', this.beforeBenchListeners.runner);
+        bench.on('complete', this.afterBenchListeners.runner);
 
         setTimeout(ui.drawBench.bind(this, this, bench));
     },
@@ -88,6 +132,22 @@ var setup = function(fn) {
 
 var after = function(fn) {
     state.currentSuite.after(fn);
+};
+
+var beforeSuite = function(fn) {
+    state.currentSuite.beforeSuite(fn);
+};
+
+var afterSuite = function(fn) {
+    state.currentSuite.afterSuite(fn);
+};
+
+var beforeBench = function(fn) {
+    state.currentSuite.beforeBench(fn);
+};
+
+var afterBench = function(fn) {
+    state.currentSuite.afterBench(fn);
 };
 
 var run = function(options) {
@@ -132,7 +192,11 @@ window.suite = function(name, fn) {
     return new Suite(name, fn);
 };
 window.setup = setup;
+window.beforeSuite = beforeSuite;
+window.beforeBench = beforeBench;
 window.bench = bench;
 window.after = after;
+window.afterSuite = afterSuite;
+window.afterBench = afterBench;
 
 window.astrobench = run;

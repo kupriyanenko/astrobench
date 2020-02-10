@@ -44,26 +44,26 @@ $ $EDITOR tests.html
 
   <script src="bower_components/astrobench/dist/astrobench.min.js"></script>
   <script>
-    // A test suite begins with a call to the global function `suite` with two parameters:
-    // a string and a function.
-    // The string is a name or title for a spec suite – usually what is being tested.
-    // The function is a block of code that implements the suite.
+    // A test suite begins with a call to the global function `suite`
+    // with two parameters: a string and a function.
+    // The string is a name or title for a spec suite – usually what is being
+    // tested. The function is a block of code that implements the suite.
     suite('String matching', function(suite) {
       var text;
 
       // To help a test suite DRY up any duplicated setup code, provides
-      // the global `setup` functions.
-      // As the name implies the `setup` function is called once.
+      // the global `beforeBench` functions. As the name implies,
+      // this function is called once before each benchmark is executed.
       // You can store data in `suite` Object, or define necessary variables.
-      // Code from body of the function will be presented in UI.
-      setup(function() {
+      // Code from body of the functions will be presented in UI.
+      beforeBench(function() {
         suite.text = 'Hello world';
         text = 'Hello world';
       });
 
-      // Benchmark are defined by calling the global function `bench`,
+      // Benchmarks are defined by calling the global function `bench`,
       // which, like `suite` takes a string and a function.
-      // The string is the title of the test and the function is the test
+      // The string is the title of the test and the function is the test.
       bench('String#match', function() {
         !! text.match(/o/);
       });
