@@ -152,16 +152,24 @@ var afterBench = function(fn) {
 
 var run = function(options) {
     var suite = state.describes[state.index],
+        onCycle = function() {
+            state.benchIndex++;
+        },
         onComplete = function() {
             state.index++;
-            suite.suite.off('complete', onComplete);
+            suite.suite
+              .off('cycle', onCycle)
+              .off('complete', onComplete);
             run(options);
         };
 
     if (suite && !state.aborted) {
+        state.benchIndex = 0;
         state.running = true;
         suite.run();
-        suite.suite.on('complete', onComplete);
+        suite.suite
+            .on('cycle', onCycle)
+            .on('complete', onComplete);
     } else {
         state.index = 0;
         state.running = false;
@@ -172,7 +180,7 @@ var run = function(options) {
     }
 };
 
-run.options = function(options) {
+var options = function(options) {
     _.assign(globalOptions, options);
 };
 
@@ -183,6 +191,10 @@ var abort = function() {
         state.aborted = true;
     }
 };
+
+run.options = options;
+run.state = state;
+run.abort = abort;
 
 exports.state = state;
 exports.run = run;
